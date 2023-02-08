@@ -1,10 +1,10 @@
-# Getting Started with Create React App
+# Chat App (PET project)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## (PET project)
 
 ## Available Scripts
 
-In the project directory, you can run:
+(PET project)
 
 ### `yarn start`
 

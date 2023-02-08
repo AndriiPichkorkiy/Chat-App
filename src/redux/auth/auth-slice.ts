@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { IFormData } from "../types/formTypes";
+import { IFormData } from "../../types/formTypes";
 interface userState {
   name: string;
   email: string;
@@ -14,7 +14,7 @@ const initialState: userState = {
   isLogIn: false,
 };
 
-export const userSlice = createSlice({
+export const authSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
@@ -28,6 +28,6 @@ export const userSlice = createSlice({
   },
 });
 
-export const { logIn, logOut } = userSlice.actions;
+export const { logIn, logOut } = authSlice.actions;
 
-export default userSlice.reducer;
+export default authSlice.reducer;

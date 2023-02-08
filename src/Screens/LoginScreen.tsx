@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { IFormData } from "../types/formTypes";
-import { logIn } from "../redux/userSlice";
+import { logIn } from "../redux/auth/auth-slice";
 import { useAppSelector, useAppDispatch } from "../redux/reduxTsHooks";
 
 const defaultState: Pick<IFormData, "email" | "password"> = {
@@ -11,7 +11,7 @@ const defaultState: Pick<IFormData, "email" | "password"> = {
 const LoginScreen: React.FC = () => {
   const [formData, setFormData] = useState(defaultState);
 
-  const anUser = useAppSelector((state) => state.user);
+  // const anUser = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
   function handlerOnChange(e: React.ChangeEvent<HTMLInputElement>): void {
