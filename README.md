@@ -1,3 +1,3 @@
 # Chat App
 
-PET project
+PET project **in progress**
