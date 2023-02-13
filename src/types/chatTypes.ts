@@ -1,7 +1,14 @@
-export interface IComment {
+export type IComment = {
   name: string;
   date: number;
-  comment: string;
+  text: string;
+};
+export type ICommentsArray = IComment[];
+
+export interface IActiveUser {
+  name: string;
+  socketID: number;
+  isTyping: boolean;
 }
 
-export type ICommentsArray = IComment[];
+export type IActiveUserArray = IActiveUser[];

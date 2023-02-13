@@ -5,7 +5,7 @@ import { ICommentsArray } from "../../types/chatTypes";
 
 const asyncGetComments = (): Promise<ICommentsArray> => {
   return new Promise((resolve, reject) =>
-    setTimeout(() => resolve(comments), 5000)
+    setTimeout(() => resolve(comments), 500)
   );
 };
 

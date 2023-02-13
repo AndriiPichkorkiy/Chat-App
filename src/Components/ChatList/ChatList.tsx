@@ -1,11 +1,11 @@
 import { ICommentsArray } from "../../types/chatTypes";
-import CommentItem from "./CommentItem";
+import CommentItem from "./ChatItem";
 
 interface IProps {
   allComments: ICommentsArray;
 }
 
-const CommentList: React.FC<IProps> = ({ allComments }) => {
+const ChatList: React.FC<IProps> = ({ allComments }) => {
   return (
     <ul>
       {allComments.map((item, i) => (
@@ -17,4 +17,4 @@ const CommentList: React.FC<IProps> = ({ allComments }) => {
   );
 };
 
-export default CommentList;
+export default ChatList;

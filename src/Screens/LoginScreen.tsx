@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { IFormData } from "../types/formTypes";
 import { logIn } from "../redux/auth/auth-slice";
 import { useAppSelector, useAppDispatch } from "../redux/reduxTsHooks";
+import socket from "../api/socket";
 
 const defaultState: Pick<IFormData, "email" | "password"> = {
   email: "",
@@ -24,7 +25,12 @@ const LoginScreen: React.FC = () => {
 
   function submit(e: React.FormEvent): void {
     e.preventDefault();
-    dispatch(logIn({ ...formData, name: "defName" }));
+    const name = `Robot-№${Math.random().toString().substring(2, 7)}`;
+    socket.emit("newUser", {
+      name: name,
+      socketID: socket.id,
+    });
+    dispatch(logIn({ ...formData, name: name }));
     console.log("formData", formData);
   }
 

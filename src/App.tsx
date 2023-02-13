@@ -5,9 +5,7 @@ import DashboardScreen from "./Screens/DashboardScreen";
 import { PrivateRoute, PublicRoute } from "./Routes/Routes";
 import ChatScreen from "./Screens/ChatScreen";
 
-// function App() {
-//   return <div className="App"></div>;
-// }
+import "./api/socket";
 
 const App: React.FC = () => {
   return (
