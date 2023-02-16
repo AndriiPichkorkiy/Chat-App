@@ -1,11 +1,11 @@
 import ChatList from "../Components/ChatList/ChatList";
 import { useEffect, useState } from "react";
-import { fetchComments } from "../redux/chat/chat-operations";
+// import { fetchComments } from "../redux/chat/chat-operations";
 import { useAppDispatch, useAppSelector } from "../redux/reduxTsHooks";
 import { IActiveUserArray, IComment, ICommentsArray } from "../types/chatTypes";
 import ChantInput from "../Components/ChatInput/ChantInput";
 import socket from "../api/socket";
-import { addComment } from "../redux/chat/chat-slice";
+import { addComment, addComments } from "../redux/chat/chat-slice";
 import { api } from "../api/fetch";
 
 const ChatScreen = () => {
@@ -17,13 +17,15 @@ const ChatScreen = () => {
   const { isLoading, error, items } = useAppSelector((state) => state.chat);
 
   useEffect(() => {
-    refreshComments();
+    // refreshComments();
     api
       .getActiveUsers()
       .then((response) => {
         if (typeof response === "object") setActiveUsers(response);
       })
       .catch(console.log);
+
+    socket.emit("enterChat");
   }, []);
 
   useEffect(() => {
@@ -41,10 +43,12 @@ const ChatScreen = () => {
 
   useEffect(() => {
     const listenNewMsg = (data: IComment) => dispath(addComment(data));
+    const getPreMsgs = (data: IComment) => dispath(addComments(data));
     socket.on("messageResponse", listenNewMsg);
-
+    socket.on("enterChat", getPreMsgs);
     return () => {
       socket.off("messageResponse", listenNewMsg);
+      socket.off("enterChat", getPreMsgs);
     };
   }, []);
 
@@ -55,24 +59,19 @@ const ChatScreen = () => {
     });
   }, []);
 
-  function refreshComments() {
-    dispath(fetchComments());
-  }
-
   if (isLoading) return <p>Is Loading...</p>;
   return (
     <>
       <h2>DashboardScreen</h2>
-      <button onClick={refreshComments}>refresh</button>
+      {/* <button onClick={refreshComments}>refresh</button> */}
       {activeUsers.map((user) => (
         <p key={user.socketID}>
           {user.name} {user.isTyping && "is typing"}
         </p>
       ))}
       {typingStatus && <p>{typingStatus}</p>}
-      {/* commentList */}
+
       <ChatList allComments={allComments} />
-      {/* textInput */}
       <ChantInput />
     </>
   );

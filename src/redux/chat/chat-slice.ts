@@ -22,6 +22,9 @@ export const chatSlice = createSlice({
     addComment: (state, { payload }) => {
       state.items = [...state.items, payload];
     },
+    addComments: (state, { payload }) => {
+      state.items = [...state.items, ...payload];
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchComments.pending, (state) => {
@@ -40,6 +43,6 @@ export const chatSlice = createSlice({
   },
 });
 
-export const { addComment } = chatSlice.actions;
+export const { addComment, addComments } = chatSlice.actions;
 
 export const chatReducer = chatSlice.reducer;
