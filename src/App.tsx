@@ -6,6 +6,7 @@ import { PrivateRoute, PublicRoute } from "./Routes/Routes";
 import ChatScreen from "./Screens/ChatScreen";
 
 import "./api/socket";
+import RegistrationScreen from "./Screens/RegistrationScreen";
 
 const App: React.FC = () => {
   return (
@@ -15,6 +16,7 @@ const App: React.FC = () => {
           <Route index element={<Navigate to="/sign-in"></Navigate>} />
           <Route element={<PublicRoute />}>
             <Route path="sign-in" element={<LoginScreen />} />
+            <Route path="sign-up" element={<RegistrationScreen />} />
           </Route>
           <Route element={<PrivateRoute />}>
             <Route path="chat" element={<DashboardScreen />}>

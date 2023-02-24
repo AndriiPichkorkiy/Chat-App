@@ -6,6 +6,7 @@ const app = express();
 
 const http = require("http").Server(app);
 const cors = require("cors");
+const authRouter = require("./routes/api/auth");
 
 const socketIO = require("socket.io")(http, {
   cors: {
@@ -13,20 +14,25 @@ const socketIO = require("socket.io")(http, {
   },
 });
 
-app.use(morgan("combined"));
+app.use(morgan("short"));
 app.use(cors());
+app.use(express.json());
 
 let users = [];
 socketIO.on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
 
-  socket.on("message", (data) => {
-    const newMessage = { ...data };
-    delete newMessage.socketID;
-    const msg = new Msg(newMessage);
-    msg.save().then(() => {
-      socketIO.emit("messageResponse", data);
-    });
+  socket.on("message", async (data) => {
+    const newMessage = {
+      text: data.text,
+      name: data.name,
+      id: data.id,
+      date: data.date,
+    };
+
+    const response = await Msg.create(newMessage);
+    console.log("response", response);
+    socketIO.emit("messageResponse", data);
   });
 
   socket.on("enterChat", () => {
@@ -57,13 +63,11 @@ socketIO.on("connection", (socket) => {
   });
 });
 
-app.get("/api", (req, res) => {
-  res.json({
-    message: "Hello world",
-  });
-});
-app.get("/chat/activeUsers", (req, res) => {
-  res.json(users);
+app.use("/api/auth", authRouter);
+
+app.use((err, req, res, next) => {
+  const { status = 500, message = "Server error" } = err;
+  res.status(status).json({ message });
 });
 
 module.exports = http;

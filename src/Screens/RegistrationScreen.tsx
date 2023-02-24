@@ -1,22 +1,23 @@
 import React, { useState } from "react";
-import { IFormData } from "../types/formTypes";
-import { logIn } from "../redux/auth/auth-slice";
-import { useAppSelector, useAppDispatch } from "../redux/reduxTsHooks";
-import socket from "../api/socket";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/fetch";
+import { IFormData } from "../types/formTypes";
+// import { logIn } from "../redux/auth/auth-slice";
+// import { useAppSelector, useAppDispatch } from "../redux/reduxTsHooks";
+// import socket from "../api/socket";
 
-const defaultState: Pick<IFormData, "email" | "password"> = {
+const defaultState: IFormData = {
+  name: "",
   email: "",
   password: "",
 };
 
-const LoginScreen: React.FC = () => {
+const RegistrationScreen: React.FC = () => {
   const [formData, setFormData] = useState(defaultState);
+  const navigate = useNavigate();
 
   // const anUser = useAppSelector((state) => state.user);
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  // const dispatch = useAppDispatch();
 
   function handlerOnChange(e: React.ChangeEvent<HTMLInputElement>): void {
     const { name, value } = e.target;
@@ -36,23 +37,24 @@ const LoginScreen: React.FC = () => {
     setFormData({ ...formData });
 
     if (Object.values(formData).every((item) => !!item)) {
-      api.login(formData).then((response) => console.log(response));
+      api.registration(formData).then((response) => console.log(response));
     } else {
       return console.warn(Object.values(formData));
     }
-
-    // const name = `Robot-№${Math.random().toString().substring(2, 7)}`;
-    // socket.emit("newUser", {
-    //   name: name,
-    //   socketID: socket.id,
-    // });
-    // dispatch(logIn({ ...formData, name: name }));
-    // console.log("formData", formData);
   }
 
   return (
     <div>
       <form>
+        <div>
+          <p>Name:</p>
+          <input
+            type="text"
+            name="name"
+            onChange={handlerOnChange}
+            value={formData.name}
+          />
+        </div>
         <div>
           <p>Email:</p>
           <input
@@ -78,17 +80,17 @@ const LoginScreen: React.FC = () => {
         </div>
       </form>
       <div>
-        <p>have not accaunt yet? </p>
+        <p>allready have an accaunt? </p>
         <button
           onClick={() => {
-            navigate("/sign-up");
+            navigate("/sign-in");
           }}
         >
-          go to registration screen
+          go to login screen
         </button>
       </div>
     </div>
   );
 };
 
-export default LoginScreen;
+export default RegistrationScreen;
