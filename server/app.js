@@ -7,6 +7,7 @@ const app = express();
 const http = require("http").Server(app);
 const cors = require("cors");
 const authRouter = require("./routes/api/auth");
+const handshake = require("./middlewares/socketHandshake");
 
 const socketIO = require("socket.io")(http, {
   cors: {
@@ -19,7 +20,7 @@ app.use(cors());
 app.use(express.json());
 
 let users = [];
-socketIO.on("connection", (socket) => {
+socketIO.use(handshake).on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
 
   socket.on("message", async (data) => {
@@ -63,6 +64,7 @@ socketIO.on("connection", (socket) => {
   });
 });
 
+app.get("/chat/activeUsers", (req, res) => res.json(users));
 app.use("/api/auth", authRouter);
 
 app.use((err, req, res, next) => {

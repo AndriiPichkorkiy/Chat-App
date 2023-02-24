@@ -1,7 +1,7 @@
 const RequestError = require("../../helpers/RequestError");
 const User = require("../../models/users");
-const crypto = require("crypto");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 async function login(req, res) {
   const { email, password } = req.body;
@@ -13,17 +13,18 @@ async function login(req, res) {
   if (!bcrypt.compare(password, user.password))
     throw RequestError(403, "wrong email");
 
-  const verificationToken = crypto.randomBytes(16).toString("hex");
+  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "12h",
+  });
 
-  // const result = {
-
-  // }
+  await User.findByIdAndUpdate(user._id, { token });
 
   res.json({
-    message: "Success!",
+    message: "Success login!",
     user: {
-      subscription: user.subscription,
+      name: user.name,
       email: user.email,
+      token: token,
     },
   });
 }

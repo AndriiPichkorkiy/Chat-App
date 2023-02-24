@@ -21,6 +21,7 @@ async function registration(req, res) {
   });
 
   res.json({
+    message: "Success registration!",
     user: {
       name: result.name,
       email: result.email,
