@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import DashboardScreen from "./Screens/DashboardScreen";
 import { PrivateRoute, PublicRoute } from "./Routes/Routes";
 import ChatScreen from "./Screens/ChatScreen";
+import "./index.css";
 
 import "./api/socket";
 import RegistrationScreen from "./Screens/RegistrationScreen";

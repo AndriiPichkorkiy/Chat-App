@@ -1,12 +1,13 @@
 import ChatList from "../Components/ChatList/ChatList";
 import { useEffect, useState } from "react";
-// import { fetchComments } from "../redux/chat/chat-operations";
 import { useAppDispatch, useAppSelector } from "../redux/reduxTsHooks";
 import { IActiveUserArray, IComment, ICommentsArray } from "../types/chatTypes";
 import ChantInput from "../Components/ChatInput/ChantInput";
-import socket from "../api/socket";
 import { addComment, addComments } from "../redux/chat/chat-slice";
 import { api } from "../api/fetch";
+import { io } from "socket.io-client";
+import { getToken } from "../redux/auth/auth-selectors";
+const WEB_ADRESS = "http://localhost:4000";
 
 const ChatScreen = () => {
   const [allComments, setAllComments] = useState<ICommentsArray>([]);
@@ -14,16 +15,26 @@ const ChatScreen = () => {
   const dispath = useAppDispatch();
   const [typingStatus, setTypingStatus] = useState<string>("");
 
+  const token = useAppSelector(getToken);
+  const [socket] = useState(() =>
+    io(WEB_ADRESS, {
+      query: { token },
+      // "force new connection": true,
+      reconnectionAttempts: Infinity,
+      timeout: 10000,
+      transports: ["websocket"],
+    })
+  );
+
   const { isLoading, error, items } = useAppSelector((state) => state.chat);
 
   useEffect(() => {
-    // refreshComments();
     api
       .getActiveUsers()
       .then((response) => {
-        if (typeof response === "object") setActiveUsers(response);
+        setActiveUsers(response);
       })
-      .catch(console.log);
+      .catch(console.error);
 
     socket.emit("enterChat");
   }, []);
@@ -43,7 +54,7 @@ const ChatScreen = () => {
 
   useEffect(() => {
     const listenNewMsg = (data: IComment) => dispath(addComment(data));
-    const getPreMsgs = (data: IComment) => dispath(addComments(data));
+    const getPreMsgs = (data: ICommentsArray) => dispath(addComments(data));
     socket.on("messageResponse", listenNewMsg);
     socket.on("enterChat", getPreMsgs);
     return () => {
@@ -72,7 +83,7 @@ const ChatScreen = () => {
       {typingStatus && <p>{typingStatus}</p>}
 
       <ChatList allComments={allComments} />
-      <ChantInput />
+      <ChantInput socket={socket} />
     </>
   );
 };

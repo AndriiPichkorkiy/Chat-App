@@ -2,9 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/fetch";
 import { IFormData } from "../types/formTypes";
-// import { logIn } from "../redux/auth/auth-slice";
-// import { useAppSelector, useAppDispatch } from "../redux/reduxTsHooks";
-// import socket from "../api/socket";
 
 const defaultState: IFormData = {
   name: "",
@@ -15,9 +12,6 @@ const defaultState: IFormData = {
 const RegistrationScreen: React.FC = () => {
   const [formData, setFormData] = useState(defaultState);
   const navigate = useNavigate();
-
-  // const anUser = useAppSelector((state) => state.user);
-  // const dispatch = useAppDispatch();
 
   function handlerOnChange(e: React.ChangeEvent<HTMLInputElement>): void {
     const { name, value } = e.target;

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ICommentsArray } from "../../types/chatTypes";
+import { IComment, ICommentsArray } from "../../types/chatTypes";
 
 import { fetchComments } from "./chat-operations";
 
@@ -19,11 +19,11 @@ export const chatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
-    addComment: (state, { payload }) => {
+    addComment: (state, { payload }: { payload: IComment }) => {
       state.items = [...state.items, payload];
     },
-    addComments: (state, { payload }) => {
-      state.items = [...state.items, ...payload];
+    addComments: (state, { payload }: { payload: ICommentsArray }) => {
+      state.items = payload;
     },
   },
   extraReducers: (builder) => {

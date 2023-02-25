@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { IFormData } from "../types/formTypes";
 import { logIn } from "../redux/auth/auth-slice";
 import { useAppSelector, useAppDispatch } from "../redux/reduxTsHooks";
-import socket from "../api/socket";
+// import socket from "../api/socket";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/fetch";
 
@@ -36,7 +36,10 @@ const LoginScreen: React.FC = () => {
     setFormData({ ...formData });
 
     if (Object.values(formData).every((item) => !!item)) {
-      api.login(formData).then((response) => console.log(response));
+      api.login(formData).then((response) => {
+        console.log(response);
+        dispatch(logIn(response.user));
+      });
     } else {
       return console.warn(Object.values(formData));
     }

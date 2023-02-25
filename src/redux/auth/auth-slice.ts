@@ -1,16 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { IFormData } from "../../types/formTypes";
+import { ILoginResponse } from "../../types/apiTypes";
 interface userState {
   name: string;
   email: string;
-  password: string;
+  token: string;
   isLogIn: boolean;
 }
 
 const initialState: userState = {
   name: "",
   email: "",
-  password: "",
+  token: "",
   isLogIn: false,
 };
 
@@ -18,10 +18,10 @@ export const authSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    logIn: (state, { payload }: { payload: IFormData }) => {
+    logIn: (state, { payload }: { payload: ILoginResponse["user"] }) => {
       state.name = payload.name;
       state.email = payload.email;
-      state.password = payload.password;
+      state.token = payload.token;
       state.isLogIn = true;
     },
     logOut: () => initialState,

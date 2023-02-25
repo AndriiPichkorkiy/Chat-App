@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import socket from "../../api/socket";
+import { Socket } from "socket.io-client";
 import { getName } from "../../redux/auth/auth-selectors";
 import { useAppSelector } from "../../redux/reduxTsHooks";
 
-const ChantInput: React.FC = () => {
+const ChantInput: React.FC<{ socket: Socket }> = ({ socket }) => {
   const [msg, setMsg] = useState<string>("");
   const useName = useAppSelector(getName);
 
