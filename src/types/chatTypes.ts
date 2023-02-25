@@ -2,6 +2,7 @@ export type IComment = {
   name: string;
   date: number;
   text: string;
+  owner: string;
 };
 export type ICommentsArray = IComment[];
 

@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const jwt = require("jsonwebtoken");
 const Msg = require("./models/messages");
 
 const app = express();
@@ -24,16 +25,19 @@ socketIO.use(handshake).on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
 
   socket.on("message", async (data) => {
+    const { token } = socket.handshake.query;
+    const { _id } = jwt.decode(token);
     const newMessage = {
       text: data.text,
       name: data.name,
       id: data.id,
       date: data.date,
+      owner: _id,
     };
 
     const response = await Msg.create(newMessage);
     console.log("response", response);
-    socketIO.emit("messageResponse", data);
+    socketIO.emit("messageResponse", response);
   });
 
   socket.on("enterChat", () => {

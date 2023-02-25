@@ -7,6 +7,7 @@ import { addComment, addComments } from "../redux/chat/chat-slice";
 import { api } from "../api/fetch";
 import { io } from "socket.io-client";
 import { getToken } from "../redux/auth/auth-selectors";
+import styled from "styled-components";
 const WEB_ADRESS = "http://localhost:4000";
 
 const ChatScreen = () => {
@@ -72,20 +73,46 @@ const ChatScreen = () => {
 
   if (isLoading) return <p>Is Loading...</p>;
   return (
-    <>
-      <h2>DashboardScreen</h2>
-      {/* <button onClick={refreshComments}>refresh</button> */}
-      {activeUsers.map((user) => (
-        <p key={user.socketID}>
-          {user.name} {user.isTyping && "is typing"}
-        </p>
-      ))}
-      {typingStatus && <p>{typingStatus}</p>}
+    <Container>
+      <Header>
+        <h2>ChatScreen</h2>
+      </Header>
+      <Main>
+        {/* <button onClick={refreshComments}>refresh</button> */}
+        {activeUsers.map((user) => (
+          <p key={user.socketID}>
+            {user.name} {user.isTyping && "is typing"}
+          </p>
+        ))}
+        {typingStatus && <p>{typingStatus}</p>}
 
-      <ChatList allComments={allComments} />
-      <ChantInput socket={socket} />
-    </>
+        <ChatList allComments={allComments} />
+      </Main>
+
+      <Footer>
+        <ChantInput socket={socket} />
+      </Footer>
+    </Container>
   );
 };
 
 export default ChatScreen;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
+
+const Header = styled.div`
+  min-height: 100px;
+`;
+const Main = styled.div`
+  flex: 1 100%;
+  overflow: auto;
+`;
+
+const Footer = styled.div`
+  min-height: 100px;
+  padding: 8px;
+`;

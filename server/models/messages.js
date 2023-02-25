@@ -4,6 +4,7 @@ const msgSchema = new mongoose.Schema({
   name: { type: String, require: true },
   id: { type: String, require: true },
   date: { type: Number, require: true },
+  owner: { type: mongoose.ObjectId, require: true },
 });
 
 const Msg = mongoose.model("msg", msgSchema);

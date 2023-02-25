@@ -5,6 +5,7 @@ interface userState {
   email: string;
   token: string;
   isLogIn: boolean;
+  _id: string;
 }
 
 const initialState: userState = {
@@ -12,6 +13,7 @@ const initialState: userState = {
   email: "",
   token: "",
   isLogIn: false,
+  _id: "",
 };
 
 export const authSlice = createSlice({
@@ -23,6 +25,7 @@ export const authSlice = createSlice({
       state.email = payload.email;
       state.token = payload.token;
       state.isLogIn = true;
+      state._id = payload._id;
     },
     logOut: () => initialState,
   },

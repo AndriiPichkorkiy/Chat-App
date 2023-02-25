@@ -41,9 +41,9 @@ const RouteColumn = styled.div`
   flex: 0 200px;
   background-color: orange;
   padding: 10px;
+  border-right: #24292e 8px dashed;
 `;
 
 const OutletColum = styled.div`
   flex: 1 auto;
-  padding: 10px;
 `;

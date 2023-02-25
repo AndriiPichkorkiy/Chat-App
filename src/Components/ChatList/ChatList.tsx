@@ -1,3 +1,4 @@
+import styled from "styled-components";
 import { ICommentsArray } from "../../types/chatTypes";
 import CommentItem from "./ChatItem";
 
@@ -7,14 +8,17 @@ interface IProps {
 
 const ChatList: React.FC<IProps> = ({ allComments }) => {
   return (
-    <ul>
+    <CommentList>
       {allComments.map((item, i) => (
-        <div key={i}>
-          <CommentItem item={item} />
-        </div>
+        <CommentItem item={item} key={i} />
       ))}
-    </ul>
+    </CommentList>
   );
 };
 
 export default ChatList;
+
+const CommentList = styled.ul`
+  display: flex;
+  flex-direction: column;
+`;
