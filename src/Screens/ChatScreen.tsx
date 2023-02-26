@@ -98,6 +98,10 @@ const ChatScreen = () => {
 
 export default ChatScreen;
 
+/////////////
+// styles //
+///////////
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;

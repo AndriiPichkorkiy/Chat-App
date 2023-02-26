@@ -18,6 +18,10 @@ const ChatList: React.FC<IProps> = ({ allComments }) => {
 
 export default ChatList;
 
+/////////////
+// styles //
+///////////
+
 const CommentList = styled.ul`
   display: flex;
   flex-direction: column;
