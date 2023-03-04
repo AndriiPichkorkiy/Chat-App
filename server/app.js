@@ -9,6 +9,7 @@ const http = require("http").Server(app);
 const cors = require("cors");
 const authRouter = require("./routes/api/auth");
 const handshake = require("./middlewares/socketHandshake");
+const User = require("./models/users");
 
 const socketIO = require("socket.io")(http, {
   cors: {
@@ -30,14 +31,38 @@ socketIO.use(handshake).on("connection", (socket) => {
     const newMessage = {
       text: data.text,
       name: data.name,
-      id: data.id,
-      date: data.date,
+      id: `${socket.id}${Math.random()}`,
+      date: Date.now(),
       owner: _id,
     };
 
     const response = await Msg.create(newMessage);
     console.log("response", response);
     socketIO.emit("messageResponse", response);
+  });
+
+  socket.on("messageEdit", async (data) => {
+    const { token } = socket.handshake.query;
+    const { _id } = jwt.decode(token);
+
+    const user = User.findById(_id);
+    if (!user) return { error: true };
+
+    const newMessage = {
+      text: data.text,
+      date: Date.now(),
+    };
+
+    const messageFromDB = await Msg.findById(data._id);
+    if (messageFromDB.owner !== user._id) {
+      console.log("NO PERMITIONS!");
+      return { error: true };
+    }
+    const response = await Msg.findByIdAndUpdate(data._id, newMessage, {
+      returnDocument: "after",
+    });
+
+    socketIO.emit("messageWasEdited", response);
   });
 
   socket.on("enterChat", () => {

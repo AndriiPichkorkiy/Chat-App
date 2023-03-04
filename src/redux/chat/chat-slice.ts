@@ -25,6 +25,13 @@ export const chatSlice = createSlice({
     addComments: (state, { payload }: { payload: ICommentsArray }) => {
       state.items = payload;
     },
+    changeEditedComment: (state, { payload }: { payload: IComment }) => {
+      const index = state.items.findIndex(
+        (comment) => comment._id === payload._id
+      );
+      if (index >= 1) state.items[index] = payload;
+      // state.items = [...state.items, payload];
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchComments.pending, (state) => {
@@ -43,6 +50,7 @@ export const chatSlice = createSlice({
   },
 });
 
-export const { addComment, addComments } = chatSlice.actions;
+export const { addComment, addComments, changeEditedComment } =
+  chatSlice.actions;
 
 export const chatReducer = chatSlice.reducer;

@@ -14,8 +14,10 @@ const ChatItemContextMenu: React.FC = () => {
   const { coords } = useContext(MenuContext) as ContextMenuType;
   return (
     <Container coords={coords} data-contextMenu="true">
-      {coords.options.map(({ title, fun }) => (
-        <button onMouseDown={fun}>{title}</button>
+      {coords.options.map(({ title, fun }, i) => (
+        <button key={i} onMouseDown={fun}>
+          {title}
+        </button>
       ))}
     </Container>
   );
@@ -32,4 +34,6 @@ const Container = styled.div<{ coords: ICoords }>`
   height: 128px;
   width: 80px;
   background-color: skyblue;
+  transition-property: all;
+  transition-duration: 250ms;
 `;

@@ -7,12 +7,19 @@ import { IComment } from "../../types/chatTypes";
 import { ContextMenuType } from "../../types/contextTypes";
 import { MenuContext } from "../ContextMenu/ContextMenu";
 
-const ChatItem = ({ item }: { item: IComment }) => {
+interface IProps {
+  item: IComment;
+  editMsg: (comment: IComment) => void;
+}
+
+const ChatItem: React.FC<IProps> = ({ item, editMsg }) => {
   const [isSelected, setIsSelected] = useState(false);
   const { setCoords } = useContext(MenuContext) as ContextMenuType;
   const _id = useAppSelector(getAuthId);
   const dateFull = new Date(item.date).toLocaleDateString();
   const isOwn = item.owner === _id;
+
+  // console.log("isOwn", isOwn);
 
   const contextMenuHandler = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -24,25 +31,28 @@ const ChatItem = ({ item }: { item: IComment }) => {
       y,
       isShown: true,
       onClose: () => setIsSelected(false),
-      options: constextMenuOptions,
+      options: getConstextMenuOptions(),
     });
   };
 
-  const constextMenuOptions = [
-    {
-      title: "copy",
-      fun: () => {
-        console.log("click");
-        copyTextToClipboard(item.text);
+  function getConstextMenuOptions() {
+    return [
+      {
+        title: "copy",
+        fun: () => {
+          console.log("click");
+          copyTextToClipboard(item.text);
+        },
       },
-    },
-    {
-      title: "title bla bla bla",
-      fun: () => {
-        copyTextToClipboard(item.text);
+      {
+        title: "edit",
+        fun: () => {
+          editMsg(item);
+          console.log(item);
+        },
       },
-    },
-  ];
+    ];
+  }
 
   // const contextMenuOnClose = () => {
   //   setIsSelected(false);
@@ -52,10 +62,11 @@ const ChatItem = ({ item }: { item: IComment }) => {
   return (
     <Li
       isSelected={isSelected}
+      isOwn={isOwn}
       onContextMenu={contextMenuHandler}
       onClick={() => setIsSelected(false)}
     >
-      <ItemContainer isOwn={isOwn}>
+      <ItemContainer>
         <NameElement>{item.name}</NameElement>
 
         <p>{item.text}</p>
@@ -73,9 +84,6 @@ export default ChatItem;
 
 interface ILi {
   isSelected: boolean;
-}
-
-interface IContainer {
   isOwn: boolean;
 }
 
@@ -84,9 +92,15 @@ const Li = styled.li<ILi>`
   background: ${({ isSelected }) => {
     return isSelected ? "#FFFFFF55" : "unset";
   }};
+
+  flex-direction: ${({ isOwn }) => {
+    return isOwn ? "row-reverse" : "row";
+  }};
 `;
 
-const ItemContainer = styled.div<IContainer>`
+//row-reverse;
+
+const ItemContainer = styled.div`
   border-radius: 8px;
   background-color: white;
   width: fit-content;
@@ -94,9 +108,6 @@ const ItemContainer = styled.div<IContainer>`
   color: black;
   margin: 16px;
   padding: 8px;
-  align-self: ${({ isOwn }) => {
-    return isOwn ? "end" : "start";
-  }};
 `;
 
 const NameElement = styled.span`
