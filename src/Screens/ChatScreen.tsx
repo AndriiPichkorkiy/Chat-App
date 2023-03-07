@@ -14,7 +14,11 @@ import { getName, getToken } from "../redux/auth/auth-selectors";
 import styled from "styled-components";
 const WEB_ADRESS = "http://localhost:4000";
 
-const ChatScreen = () => {
+interface IChatScreen {
+  room: string;
+}
+
+const ChatScreen: React.FC<IChatScreen> = ({ room }) => {
   const [allComments, setAllComments] = useState<ICommentsArray>([]);
   const [activeUsers, setActiveUsers] = useState<IActiveUserArray>([]);
   const dispath = useAppDispatch();
@@ -41,8 +45,8 @@ const ChatScreen = () => {
       })
       .catch(console.error);
 
-    socket.emit("enterChat");
-  }, []);
+    socket.emit("join room", { room });
+  }, [room]);
 
   useEffect(() => {
     setAllComments(items);
@@ -55,7 +59,7 @@ const ChatScreen = () => {
     return () => {
       socket.off("typingResponse", sendTypingStatus);
     };
-  }, []);
+  }, [room]);
 
   useEffect(() => {
     const listenNewMsg = (data: IComment) => dispath(addComment(data));
@@ -72,14 +76,14 @@ const ChatScreen = () => {
       socket.off("enterChat", getPreMsgs);
       socket.off("messageWasEdited", handlerMessageWasEdited);
     };
-  }, []);
+  }, [room]);
 
   useEffect(() => {
     socket.on("newUserResponse", (data) => {
       console.log("newUserResponse", data);
       setActiveUsers(data);
     });
-  }, []);
+  }, [room]);
 
   // input
   const [msg, setMsg] = useState<string>("");
@@ -96,11 +100,13 @@ const ChatScreen = () => {
       socket.emit("messageEdit", {
         text: message,
         _id: isEditing._id,
+        room,
       });
     } else {
       socket.emit("message", {
         text: message,
         name: useName,
+        room,
       });
     }
 

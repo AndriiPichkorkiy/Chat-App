@@ -17,7 +17,7 @@ const DashboardScreen: React.FC = () => {
         <br />
         <Link to="cabinet">go to cabinet</Link>
         <br />
-        <Link to="privat">go to privat</Link>
+        <Link to="chat-2">go to chat-2</Link>
         <br />
         <button onClick={doLogOut}>LogOut</button>
       </RouteColumn>

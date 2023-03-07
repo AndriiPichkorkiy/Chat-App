@@ -11,7 +11,7 @@ export const api = {
       const response = await fetch(request);
       // console.log("response", response);
       const data: IActiveUserArray = await response.json();
-      console.log("data", data);
+      console.log("getActiveUsers", data);
       return data;
     } catch (error) {
       if (error instanceof Error) {

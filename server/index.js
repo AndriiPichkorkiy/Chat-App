@@ -2,6 +2,7 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const chalk = require("chalk");
 const http = require("./app");
+const Room = require("./models/rooms");
 const { PORT, DB_HOST } = process.env;
 
 mongoose
@@ -11,7 +12,8 @@ mongoose
       if (error) return console.error(error.message);
 
       console.log(chalk.cyan.underline(`http://localhost:${PORT}`));
-      console.log(`Server running. Use our API on port: ${PORT}`);
+      // console.log(`Server running. Use our API on port: ${PORT}`);
+      // console.log("room");
     });
   })
   .catch((error) => {

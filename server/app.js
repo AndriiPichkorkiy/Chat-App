@@ -10,6 +10,7 @@ const cors = require("cors");
 const authRouter = require("./routes/api/auth");
 const handshake = require("./middlewares/socketHandshake");
 const User = require("./models/users");
+const Room = require("./models/rooms");
 
 const socketIO = require("socket.io")(http, {
   cors: {
@@ -28,6 +29,8 @@ socketIO.use(handshake).on("connection", (socket) => {
   socket.on("message", async (data) => {
     const { token } = socket.handshake.query;
     const { _id } = jwt.decode(token);
+    const room = await Room.findOne({ name: data.room });
+
     const newMessage = {
       text: data.text,
       name: data.name,
@@ -35,40 +38,59 @@ socketIO.use(handshake).on("connection", (socket) => {
       date: Date.now(),
       owner: _id,
     };
+    const subDoc = room.messages.create(newMessage);
+    room.messages.push(subDoc);
+    await room.save();
 
-    const response = await Msg.create(newMessage);
-    console.log("response", response);
-    socketIO.emit("messageResponse", response);
+    // const response = await Msg.create(newMessage);
+    socketIO.to(data.room).emit("messageResponse", subDoc);
   });
 
   socket.on("messageEdit", async (data) => {
     const { token } = socket.handshake.query;
     const { _id } = jwt.decode(token);
-
-    const user = User.findById(_id);
-    if (!user) return { error: true };
-
-    const newMessage = {
-      text: data.text,
-      date: Date.now(),
-    };
-
-    const messageFromDB = await Msg.findById(data._id);
-    if (messageFromDB.owner !== user._id) {
-      console.log("NO PERMITIONS!");
-      return { error: true };
+    const room = await Room.findOne({ name: data.room });
+    const messageFromDB = room.messages.id(data._id);
+    console.log("messageFromDB", messageFromDB);
+    if (!messageFromDB || !messageFromDB.owner.equals(_id)) {
+      return { error: "NO PERMITIONS!" };
     }
-    const response = await Msg.findByIdAndUpdate(data._id, newMessage, {
-      returnDocument: "after",
-    });
+    // if (!messageFromDB.owner.equals(_id)) {
+    //   // const messageFromDB = await room.messages.findById(data._id);
 
-    socketIO.emit("messageWasEdited", response);
+    //   return { error: "NO PERMITIONS!" };
+    // }
+
+    // const newMessage = {
+    //   text: data.text,
+    //   date: Date.now(),
+    // };
+
+    messageFromDB.text = data.text;
+    messageFromDB.date = Date.now();
+    room.markModified("messages");
+    room.save(function (saveerr, saveResult) {
+      if (!saveerr) {
+        // console.log("saveResult", saveResult);
+        const response = saveResult.messages.id(data._id); // 200
+        socketIO.to(data.room).emit("messageWasEdited", response);
+      } else {
+        // console.log("saveerr", saveerr); // 400
+      }
+    });
+    // const response = await Msg.findByIdAndUpdate(data._id, newMessage, {
+    //   returnDocument: "after",
+    // });
+
+    // socketIO.to(data.room).emit("messageWasEdited", response);
   });
 
-  socket.on("enterChat", () => {
-    Msg.find().then((response) => {
-      socket.emit("enterChat", response);
-    });
+  socket.on("join room", async ({ room: roomName }) => {
+    socket.join(roomName);
+    const room = await Room.findOne({ name: roomName });
+
+    // Msg.find().then((response) => socket.emit("enterChat", response));
+    socket.emit("enterChat", room.messages);
   });
 
   socket.on("newUser", (data) => {

@@ -10,8 +10,8 @@ interface IProps {
 const ChatList: React.FC<IProps> = ({ allComments, editMsg }) => {
   return (
     <CommentList>
-      {allComments.map((item, i) => (
-        <CommentItem item={item} key={i} editMsg={editMsg} />
+      {allComments.map((item) => (
+        <CommentItem item={item} key={item._id} editMsg={editMsg} />
       ))}
     </CommentList>
   );
