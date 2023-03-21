@@ -29,7 +29,9 @@ export const chatSlice = createSlice({
       const index = state.items.findIndex(
         (comment) => comment._id === payload._id
       );
-      if (index >= 1) state.items[index] = payload;
+      console.log(index);
+      console.log(state.items);
+      if (index !== -1) state.items[index] = payload;
       // state.items = [...state.items, payload];
     },
   },

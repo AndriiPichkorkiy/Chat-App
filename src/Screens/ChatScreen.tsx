@@ -65,7 +65,7 @@ const ChatScreen: React.FC<IChatScreen> = ({ room }) => {
     const listenNewMsg = (data: IComment) => dispath(addComment(data));
     const getPreMsgs = (data: ICommentsArray) => dispath(addComments(data));
     const handlerMessageWasEdited = (data: IComment) => {
-      console.log("data", data);
+      console.log("handlerMessageWasEdited data", data);
       dispath(changeEditedComment(data));
     };
     socket.on("messageResponse", listenNewMsg);

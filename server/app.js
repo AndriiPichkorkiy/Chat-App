@@ -51,7 +51,7 @@ socketIO.use(handshake).on("connection", (socket) => {
     const { _id } = jwt.decode(token);
     const room = await Room.findOne({ name: data.room });
     const messageFromDB = room.messages.id(data._id);
-    console.log("messageFromDB", messageFromDB);
+
     if (!messageFromDB || !messageFromDB.owner.equals(_id)) {
       return { error: "NO PERMITIONS!" };
     }
@@ -71,7 +71,6 @@ socketIO.use(handshake).on("connection", (socket) => {
     room.markModified("messages");
     room.save(function (saveerr, saveResult) {
       if (!saveerr) {
-        // console.log("saveResult", saveResult);
         const response = saveResult.messages.id(data._id); // 200
         socketIO.to(data.room).emit("messageWasEdited", response);
       } else {
