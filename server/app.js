@@ -11,6 +11,8 @@ const authRouter = require("./routes/api/auth");
 const handshake = require("./middlewares/socketHandshake");
 const User = require("./models/users");
 const Room = require("./models/rooms");
+const { joinRoom, getPrevious } = require("./controllers/socket");
+const socketCtrlWrapper = require("./helpers/socketCtrlWrapper");
 
 const socketIO = require("socket.io")(http, {
   cors: {
@@ -25,6 +27,9 @@ app.use(express.json());
 let users = [];
 socketIO.use(handshake).on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
+  users.push(socket.socketUser);
+
+  socketIO.emit("newUserResponse", users);
 
   socket.on("message", async (data) => {
     const { token } = socket.handshake.query;
@@ -46,6 +51,8 @@ socketIO.use(handshake).on("connection", (socket) => {
     socketIO.to(data.room).emit("messageResponse", subDoc);
   });
 
+  socket.on("getPrevious", socketCtrlWrapper(getPrevious, socket));
+
   socket.on("messageEdit", async (data) => {
     const { token } = socket.handshake.query;
     const { _id } = jwt.decode(token);
@@ -55,16 +62,6 @@ socketIO.use(handshake).on("connection", (socket) => {
     if (!messageFromDB || !messageFromDB.owner.equals(_id)) {
       return { error: "NO PERMITIONS!" };
     }
-    // if (!messageFromDB.owner.equals(_id)) {
-    //   // const messageFromDB = await room.messages.findById(data._id);
-
-    //   return { error: "NO PERMITIONS!" };
-    // }
-
-    // const newMessage = {
-    //   text: data.text,
-    //   date: Date.now(),
-    // };
 
     messageFromDB.text = data.text;
     messageFromDB.date = Date.now();
@@ -77,20 +74,9 @@ socketIO.use(handshake).on("connection", (socket) => {
         // console.log("saveerr", saveerr); // 400
       }
     });
-    // const response = await Msg.findByIdAndUpdate(data._id, newMessage, {
-    //   returnDocument: "after",
-    // });
-
-    // socketIO.to(data.room).emit("messageWasEdited", response);
   });
 
-  socket.on("join room", async ({ room: roomName }) => {
-    socket.join(roomName);
-    const room = await Room.findOne({ name: roomName });
-
-    // Msg.find().then((response) => socket.emit("enterChat", response));
-    socket.emit("enterChat", room.messages);
-  });
+  socket.on("join room", socketCtrlWrapper(joinRoom, socket));
 
   socket.on("newUser", (data) => {
     users.push(data);
@@ -114,7 +100,7 @@ socketIO.use(handshake).on("connection", (socket) => {
   });
 });
 
-app.get("/chat/activeUsers", (req, res) => res.json(users));
+app.get("/users", (req, res) => res.json(users));
 app.use("/api/auth", authRouter);
 
 app.use((err, req, res, next) => {

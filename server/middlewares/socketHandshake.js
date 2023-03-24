@@ -5,6 +5,8 @@ function handshake(socket, next) {
   if (token) {
     try {
       jwt.verify(token, process.env.JWT_SECRET);
+      const { name } = jwt.decode(token);
+      socket.socketUser = { name, socketID: socket.id };
       next();
     } catch (error) {
       console.log("catch error", error.message);

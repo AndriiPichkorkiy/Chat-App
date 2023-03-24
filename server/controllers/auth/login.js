@@ -13,9 +13,13 @@ async function login(req, res) {
   if (!bcrypt.compare(password, user.password))
     throw RequestError(403, "wrong email");
 
-  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "12h",
-  });
+  const token = jwt.sign(
+    { _id: user._id, name: user.name },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "12h",
+    }
+  );
 
   await User.findByIdAndUpdate(user._id, { token });
 

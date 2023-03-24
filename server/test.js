@@ -8,14 +8,34 @@ mongoose
   .connect(DB_HOST)
   .then(async () => {
     console.log("connected === === ===");
-    const result = await Room.aggregate([
-      { $match: { name: "general" } },
-      { $unwind: "$messages" },
-      { $match: { name: "catcatdog" } },
-    ]);
+    // const result = await Room.aggregate([
+    //   { $match: { name: "general" } },
+    //   { $project: { messages: 1, total: { $size: "$messages" } } },
+    // { $unwind: "$messages" },
+    // { $skip: 5 },
+    // { $limit: 2 },
+
+    // {
+    //   $group: {
+    //     _id: null,
+    //     messages: { $push: "$messages" },
+    //     // total: { $size: "$messages" },
+    //   },
+    // },
+
+    // occurances: {$push: {'user': '$_id', count: '$count'}}
+    // { $slice: ["$messages", 0, 2] },
+    // ]);
+
+    const result = await Room.find(
+      { name: "general" },
+      {
+        messages: { $slice: [-2, 2] },
+        total: { $size: "$messages" },
+      }
+    );
+
     console.log(result.length);
-    // result.forEach(console.log);
-    // console.log(result);
     console.log(JSON.stringify(result, null, 2));
     process.exit(1);
   })
