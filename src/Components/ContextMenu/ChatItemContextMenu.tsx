@@ -13,7 +13,7 @@ interface ICoords {
 const ChatItemContextMenu: React.FC = () => {
   const { coords } = useContext(MenuContext) as ContextMenuType;
   return (
-    <Container coords={coords} data-contextMenu="true">
+    <Container coords={coords} data-context-menu="true">
       {coords.options.map(({ title, fun }, i) => (
         <button key={i} onMouseDown={fun}>
           {title}

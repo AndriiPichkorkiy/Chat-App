@@ -1,24 +1,23 @@
-// const formData = {
-//   name: " Alex",
-//   password: " qwerty",
-// };
-
-// const keys = Object.keys(formData);
-// keys.forEach((key) => {
-//   formData[key] = formData[key].trim();
-// });
-
-// console.log(formData);
-
-const population = {
-  male: 4,
-  female: 93,
-  others: 10,
-};
-
-// Iterate through the object
-for (const key in population) {
-  // if (population.hasOwnProperty(key)) {
-  console.log(`${key}: ${population[key]}`);
-  // }
+function combie(param1, param2) {
+    if (typeof param1 === "string" || typeof param2 === "string") {
+        return param1.toString() + param2.toString();
+    }
+    return param1 + param2;
 }
+combie(2, "up");
+function merge(objA, objB) {
+    return Object.assign({}, objA, objB);
+}
+var x = {
+    name: "Bob"
+};
+var y = {
+    age: 30
+};
+var merged = merge(x, y);
+var merged2 = merge(["string"], y);
+function getLength(str) {
+    return str.length;
+}
+var result = getLength({ name: "bob" });
+console.log(result);

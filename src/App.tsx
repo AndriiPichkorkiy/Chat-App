@@ -25,8 +25,9 @@ const App: React.FC = () => {
             <Route element={<PrivateRoute />}>
               <Route path="chat" element={<DashboardScreen />}>
                 <Route path="cabinet" element={<p>Cabinet Route</p>} />
-                <Route path="general" element={<ChatScreen room="general" />} />
-                <Route path="chat-2" element={<ChatScreen room="chat-2" />} />
+                {/* <Route path="general" element={<ChatScreen room="general" />} /> */}
+                {/* <Route path="chat-2" element={<ChatScreen room="chat-2" />} /> */}
+                <Route path=":roomName" element={<ChatScreen />} />
               </Route>
             </Route>
           </Route>

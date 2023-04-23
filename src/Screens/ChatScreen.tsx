@@ -7,45 +7,58 @@ import {
   addComment,
   addComments,
   changeEditedComment,
+  addPreviousComments,
 } from "../redux/chat/chat-slice";
 import { api } from "../api/fetch";
-import { io } from "socket.io-client";
-import { getName, getToken } from "../redux/auth/auth-selectors";
+import { io, Socket } from "socket.io-client";
+import { getAuthId, getName, getToken } from "../redux/auth/auth-selectors";
 import styled from "styled-components";
-const WEB_ADRESS = "http://localhost:4000";
+import { useOutletContext, useParams } from "react-router-dom";
+// const WEB_ADRESS = "http://localhost:4000";
 
-interface IChatScreen {
-  room: string;
-}
+const ChatScreen: React.FC = () => {
+  const room: string = useParams().roomName!;
+  // const [isJoined, setIsJoined] = useState("pending");
 
-const ChatScreen: React.FC<IChatScreen> = ({ room }) => {
+  const _id = useAppSelector(getAuthId);
+
+  const socket = useOutletContext<Socket>();
   const [allComments, setAllComments] = useState<ICommentsArray>([]);
-  const [activeUsers, setActiveUsers] = useState<IActiveUserArray>([]);
-  const dispath = useAppDispatch();
-  const [typingStatus, setTypingStatus] = useState<string>("");
 
-  const token = useAppSelector(getToken);
-  const [socket] = useState(() =>
-    io(WEB_ADRESS, {
-      query: { token },
-      // "force new connection": true,
-      reconnectionAttempts: Infinity,
-      timeout: 10000,
-      transports: ["websocket"],
-    })
-  );
+  const dispath = useAppDispatch();
+
+  const [pagination, setPagination] = useState({
+    total: 0,
+    cursor: 0,
+    limit: 5,
+    defLimit: 5,
+  });
+
+  const getPrevious = async () => {
+    socket.emit(
+      "getPrevious",
+      {
+        room,
+        from: pagination.cursor,
+        limit: pagination.limit,
+      },
+      (response: { messages: ICommentsArray; total: number }) => {
+        setPagination((prev) => ({ ...prev, cursor: prev.cursor - 5 }));
+        dispath(addPreviousComments(response.messages));
+      }
+    );
+  };
 
   const { isLoading, items } = useAppSelector((state) => state.chat);
 
   useEffect(() => {
-    api
-      .getActiveUsers()
-      .then((response) => {
-        setActiveUsers(response);
-      })
-      .catch(console.error);
-
-    socket.emit("join room", { room });
+    socket.emit("join room", { room }, (response: any) => {
+      if (response.error) {
+        // setIsJoined("reject");
+      } else {
+        getPreMsgs(response);
+      }
+    });
   }, [room]);
 
   useEffect(() => {
@@ -53,37 +66,50 @@ const ChatScreen: React.FC<IChatScreen> = ({ room }) => {
   }, [items]);
 
   useEffect(() => {
-    const sendTypingStatus = (data: string) => setTypingStatus(data);
-    socket.on("typingResponse", sendTypingStatus);
-
-    return () => {
-      socket.off("typingResponse", sendTypingStatus);
-    };
-  }, [room]);
-
-  useEffect(() => {
     const listenNewMsg = (data: IComment) => dispath(addComment(data));
-    const getPreMsgs = (data: ICommentsArray) => dispath(addComments(data));
+
     const handlerMessageWasEdited = (data: IComment) => {
-      console.log("handlerMessageWasEdited data", data);
       dispath(changeEditedComment(data));
     };
     socket.on("messageResponse", listenNewMsg);
-    socket.on("enterChat", getPreMsgs);
     socket.on("messageWasEdited", handlerMessageWasEdited);
     return () => {
       socket.off("messageResponse", listenNewMsg);
-      socket.off("enterChat", getPreMsgs);
       socket.off("messageWasEdited", handlerMessageWasEdited);
     };
   }, [room]);
 
-  useEffect(() => {
-    socket.on("newUserResponse", (data) => {
-      console.log("newUserResponse", data);
-      setActiveUsers(data);
+  const getPreMsgs = (data: {
+    messages: ICommentsArray;
+    total: number;
+    members: IActiveUserArray;
+    waitingMembers: IActiveUserArray;
+  }) => {
+    console.log("getPreMsgs data", data);
+    dispath(addComments(data.messages));
+
+    setPagination((prev) => {
+      let cursor;
+      let limit = 5;
+
+      if (data.total <= 5) {
+        cursor = -1;
+      } else {
+        cursor = data.total - prev.defLimit * 2;
+        if (cursor < 0) {
+          limit = cursor + prev.defLimit;
+          cursor = 0;
+        }
+      }
+
+      return {
+        ...prev,
+        cursor,
+        limit,
+        total: data.total,
+      };
     });
-  }, [room]);
+  };
 
   // input
   const [msg, setMsg] = useState<string>("");
@@ -118,20 +144,37 @@ const ChatScreen: React.FC<IChatScreen> = ({ room }) => {
     setIsEditing(comment);
   }
 
+  // function sendRequest() {
+  //   console.log("sending");
+  //   socket.emit("join request", room);
+  // }
+
   if (isLoading) return <p>Is Loading...</p>;
+  // if (isJoined === "reject")
+  //   return (
+  //     <Container>
+  //       <Header>
+  //         <h2>Send request to join a chat</h2>
+  //         <button onClick={sendRequest}>Send request</button>
+  //       </Header>
+  //     </Container>
+  //   );
+
   return (
     <Container>
       <Header>
         <h2>ChatScreen</h2>
       </Header>
-      <Main>
-        {activeUsers.map((user) => (
-          <p key={user.socketID}>
-            {user.name} {user.isTyping && "is typing"}
-          </p>
-        ))}
-        {typingStatus && <p>{typingStatus}</p>}
 
+      <Main>
+        {pagination.cursor < 0 ? null : (
+          <button onClick={getPrevious}>
+            upload messages from
+            <b> {pagination.cursor} </b>
+            to
+            <b> {pagination.cursor + pagination.limit} </b>
+          </button>
+        )}
         <ChatList allComments={allComments} editMsg={editMsg} />
       </Main>
 

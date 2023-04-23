@@ -22,6 +22,9 @@ export const chatSlice = createSlice({
     addComment: (state, { payload }: { payload: IComment }) => {
       state.items = [...state.items, payload];
     },
+    addPreviousComments: (state, { payload }: { payload: ICommentsArray }) => {
+      state.items = [...payload, ...state.items];
+    },
     addComments: (state, { payload }: { payload: ICommentsArray }) => {
       state.items = payload;
     },
@@ -52,7 +55,11 @@ export const chatSlice = createSlice({
   },
 });
 
-export const { addComment, addComments, changeEditedComment } =
-  chatSlice.actions;
+export const {
+  addComment,
+  addPreviousComments,
+  addComments,
+  changeEditedComment,
+} = chatSlice.actions;
 
 export const chatReducer = chatSlice.reducer;

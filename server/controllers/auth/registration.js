@@ -1,5 +1,5 @@
 const RequestError = require("../../helpers/RequestError");
-const User = require("../../models/users");
+const { User } = require("../../models/users");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 
